@@ -6,31 +6,26 @@
 std::string performOCR(const std::string& imagePath) {
     tesseract::TessBaseAPI ocr;
     
-    // Initialize Tesseract to use English (eng) and the LSTM OCR engine.
     if (ocr.Init(nullptr, "eng")) {
         std::cerr << "Could not initialize tesseract.\n";
         return "";
     }
     
-    // Open the JPEG image file.
     Pix* image = pixRead(imagePath.c_str());
     if (!image) {
         std::cerr << "Cannot open input file: " << imagePath << std::endl;
         return "";
     }
 
-    // Set the image for Tesseract.
     ocr.SetImage(image);
 
-    // Get OCR result
+    // obtain results
     std::unique_ptr<char[]> outText(ocr.GetUTF8Text());
     std::string result = outText.get();
 
-    // Clean up
     pixDestroy(&image);
     ocr.End();
 
-    // Remove whitespace
     result.erase(std::remove_if(result.begin(), result.end(), ::isspace),
         result.end());
 
